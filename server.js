@@ -12,16 +12,30 @@ let tasks = [
   { id: 3, description: 'Walk the dog', completed: false }
 ];
 
-
+// GET /api/tasks — Return all tasks, with filtering
 app.get('/api/tasks', (req, res) => {
-  res.json(tasks);
+  const { completed } = req.query;
+  let filteredTasks = tasks;
+
+  if (completed !== undefined) {
+    const completedBool = completed === 'true';
+    filteredTasks = tasks.filter(task => task.completed === completedBool);
+  }
+
+  res.json(filteredTasks);
 });
 
 // POST /api/tasks — Add a new task
 app.post('/api/tasks', (req, res) => {
+  const { description } = req.body;
+
+  if (!description) {
+    return res.status(400).json({ message: 'Description cannot be empty' });
+  }
+
   const newTask = {
     id: tasks.length + 1,
-    description: req.body.description,
+    description: description,
     completed: false
   };
   tasks.push(newTask);
